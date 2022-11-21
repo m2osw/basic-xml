@@ -1,0 +1,5 @@
+basic-xml (1.0.0.0~bionic) bionic; urgency=high
+
+  * First separate project for quickly loading simple XML files.
+
+ -- Alexis Wilke <alexis@m2osw.com>  Sun, 20 Nov 2022 08:49:42 -0800

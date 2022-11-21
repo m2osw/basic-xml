@@ -1,0 +1,41 @@
+Source: basic-xml
+Priority: extra
+Maintainer: Alexis Wilke <alexis@m2osw.com>
+Build-Depends: cmake,
+    debhelper,
+    doxygen,
+    graphviz,
+    libboost-dev,
+    libexcept-dev (>= 1.1.0.0~bionic),
+    libutf8-dev (>= 1.0.14.0~bionic),
+    snapcatch2 (>= 2.7.2.10~bionic),
+    snapcmakemodules (>= 1.0.35.3~bionic),
+    snapdev (>= 1.1.16.0~bionic)
+Standards-Version: 3.9.4
+Section: libs
+Homepage: https://snapwebsites.org/
+Vcs-Git: https://github.com/m2osw/snapcpp.git
+Vcs-Browser: https://github.com/m2osw/basic-xml
+
+Package: basic-xml-dev
+Section: libdevel
+Architecture: any
+Depends: basic-xml (= ${binary:Version}), ${misc:Depends}
+Description: Development package for the C++ basic-xml library.
+ This library provides functions to read very basic XML files.
+
+Package: basic-xml-doc
+Section: doc
+Architecture: all
+Depends: ${misc:Depends}
+Description: Documentation for the C++ basic-xml library.
+ This library provides functions to read very basic XML files.
+
+Package: basic-xml
+Section: libs
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: C++ library for loading basic XML files.
+ This library provides functions to read very basic XML files.
+
+# vim: ts=4 sw=4 et
