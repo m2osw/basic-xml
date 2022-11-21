@@ -265,7 +265,7 @@ std::ostream & operator << (std::ostream & out, node const & n)
             << quote;
     }
     auto child(n.first_child());
-    bool empty(child == nullptr && n.text().empty());
+    bool empty(child == nullptr && n.text().empty() && n.parent() != nullptr);
     if(empty)
     {
         out << '/';

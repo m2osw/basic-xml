@@ -1,4 +1,4 @@
-# Copyright (c) 2019-2022  Made to Order Software Corp.  All Rights Reserved
+# Copyright (c) 2013-2022  Made to Order Software Corp.  All Rights Reserved.
 #
 # https://snapwebsites.org/project/basic-xml
 # contact@m2osw.com
@@ -16,31 +16,39 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.10.2)
 
-# The Snap! C++ Versatile Database Support
-project(basic_xml_project)
+##
+## basic-xml
+##
+project(basic-xml-tool)
 
-find_package(Boost            REQUIRED)
-find_package(LibExcept        REQUIRED)
-find_package(LibUtf8          REQUIRED)
-find_package(SnapCMakeModules REQUIRED)
-find_package(SnapDev          REQUIRED)
+add_executable(${PROJECT_NAME}
+    basic_xml.cpp
+)
 
-SnapGetVersion(BASIC_XML ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(${PROJECT_NAME}
+    PUBLIC
+        ${SNAPDEV_INCLUDE_DIRS}
+        ${BOOST_INCLUDE_DIRS}
+        ${LIBEXCEPT_INCLUDE_DIRS}
+)
 
-include_directories(
-    ${CMAKE_CURRENT_BINARY_DIR}
-    ${CMAKE_CURRENT_SOURCE_DIR}
+target_link_libraries(${PROJECT_NAME}
+    basic-xml
+)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME basic-xml)
+
+install(
+    TARGETS
+        ${PROJECT_NAME}
+
+    RUNTIME DESTINATION
+        bin
+
+    COMPONENT
+        runtime
 )
 
 
-add_subdirectory(cmake)
-#add_subdirectory(conf)
-add_subdirectory(basic-xml)
-add_subdirectory(tools)
-add_subdirectory(tests)
-add_subdirectory(doc)
-
-
-# vim: ts=4 sw=4 et
+# vim: ts=4 sw=4 et nocindent
