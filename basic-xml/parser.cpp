@@ -294,6 +294,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
             case '?':
                 // we do not parse the processor entry, we do not care about
                 // it at the moment
+                //
                 for(;;)
                 {
                     c = getc();
@@ -396,6 +397,9 @@ parser::token_t parser::get_token(bool parsing_attributes)
                     c = getc();
                     if(c == '-')
                     {
+                        // this is a comment, we do not record them, they
+                        // just get dropped
+                        //
                         bool found(false);
                         while(!found)
                         {

@@ -38,7 +38,8 @@ namespace basic_xml
 bool is_alpha(char c);
 bool is_digit(char c);
 bool is_space(char c);
-bool is_token(std::string const s);
+bool is_ascii_token(std::string const & token);
+bool is_token(std::string const & token);
 
 
 
