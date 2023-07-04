@@ -1,4 +1,4 @@
-basic-xml (1.0.0.0~bionic) bionic; urgency=high
+basic-xml (1.0.0.0~jammy) jammy; urgency=high
 
   * First separate project for quickly loading simple XML files.
 
