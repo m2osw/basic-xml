@@ -1,4 +1,4 @@
-// Copyright (c) 2021-2022  Made to Order Software Corporation
+// Copyright (c) 2021-2024  Made to Order Software Corp.  All Rights Reserved
 //
 // https://snapwebsites.org/project/basic-xml
 // contact@m2osw.com

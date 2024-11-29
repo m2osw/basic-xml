@@ -1,4 +1,4 @@
-# Copyright (C) 2000-2022  Made to Order Software Corp.  All Rights Reserved
+# Copyright (c) 2000-2024  Made to Order Software Corp.  All Rights Reserved
 #
 # https://snapwebsites.org/project/basic-xml
 # contact@m2osw.com
@@ -53,6 +53,16 @@ if(SnapCatch2_FOUND)
 else(SnapCatch2_FOUND)
 
     message("snapcatch2 not found... no test will be built.")
+
+endif(SnapCatch2_FOUND)
+
+if(SnapCatch2_FOUND)
+
+    find_package(SnapTestRunner)
+    AddUnitTestsTarget(
+        PROJECT_NAME
+            rununittests
+    )
 
 endif(SnapCatch2_FOUND)
 
