@@ -16,15 +16,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// basic-xml
+//
+#include    <basic-xml/parser.h>
+
+#include    <basic-xml/exception.h>
+
+
 // self
 //
 #include    "catch_main.h"
-
-
-// basic-xml
-//
-#include    <basic-xml/exception.h>
-#include    <basic-xml/parser.h>
 
 
 // C++
@@ -35,7 +36,7 @@
 
 CATCH_TEST_CASE("parser", "[parser][valid]")
 {
-    CATCH_START_SECTION("empty root")
+    CATCH_START_SECTION("parser: empty root")
     {
         std::string const filename("empty-tag.xml");
 
@@ -56,7 +57,7 @@ CATCH_TEST_CASE("parser", "[parser][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root with processor")
+    CATCH_START_SECTION("parser: empty root with processor")
     {
         std::string const filename("empty-tag.xml");
 
@@ -77,7 +78,7 @@ CATCH_TEST_CASE("parser", "[parser][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root with comment & processor")
+    CATCH_START_SECTION("parser: empty root with comment & processor")
     {
         std::string const filename("quite-empty.xml");
 
@@ -98,7 +99,7 @@ CATCH_TEST_CASE("parser", "[parser][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root with processor & comment")
+    CATCH_START_SECTION("parser: empty root with processor & comment")
     {
         std::string const filename("swapped-empty.xml");
 
@@ -119,7 +120,7 @@ CATCH_TEST_CASE("parser", "[parser][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root with comment & processor & attributes")
+    CATCH_START_SECTION("parser: empty root with comment & processor & attributes")
     {
         std::string const filename("root-attributes.xml");
 
@@ -152,7 +153,7 @@ CATCH_TEST_CASE("parser", "[parser][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("entities test")
+    CATCH_START_SECTION("parser: entities test")
     {
         std::string const filename("entities.xml");
 
@@ -183,7 +184,7 @@ CATCH_TEST_CASE("parser", "[parser][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("parse tree")
+    CATCH_START_SECTION("parser: parse tree")
     {
         std::string const filename("tree.xml");
 
@@ -222,7 +223,7 @@ CATCH_TEST_CASE("parser", "[parser][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("parse tree (CDATA)")
+    CATCH_START_SECTION("parser: parse tree (CDATA)")
     {
         std::string const filename("tree.xml");
 
@@ -380,7 +381,7 @@ CATCH_TEST_CASE("parser", "[parser][valid]")
 
 CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
 {
-    CATCH_START_SECTION("parser does not like a completely empty input file")
+    CATCH_START_SECTION("parser_errors: parser does not like a completely empty input file")
     {
         std::stringstream ss;
         std::string const filename("empty.xml");
@@ -396,7 +397,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("file with only a processor tag")
+    CATCH_START_SECTION("parser_errors: file with only a processor tag")
     {
         std::stringstream ss;
         std::string const filename("processor.xml");
@@ -413,7 +414,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("file with only a comment tag")
+    CATCH_START_SECTION("parser_errors: file with only a comment tag")
     {
         std::stringstream ss;
         std::string const filename("comment.xml");
@@ -430,7 +431,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("file with only comment and preprocessor tags")
+    CATCH_START_SECTION("parser_errors: file with only comment and preprocessor tags")
     {
         std::stringstream ss;
         std::string const filename("comment-and-processor.xml");
@@ -449,7 +450,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("file with two processor tags and a root")
+    CATCH_START_SECTION("parser_errors: file with two processor tags and a root")
     {
         std::stringstream ss;
         std::string const filename("processor-and-root.xml");
@@ -468,7 +469,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root tag")
+    CATCH_START_SECTION("parser_errors: empty root tag")
     {
         std::stringstream ss;
         std::string const filename("empty-root.xml");
@@ -486,7 +487,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("wrong closing tag")
+    CATCH_START_SECTION("parser_errors: wrong closing tag")
     {
         std::stringstream ss;
         std::string const filename("empty-root.xml");
@@ -504,7 +505,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("text after closing root tag")
+    CATCH_START_SECTION("parser_errors: text after closing root tag")
     {
         std::stringstream ss;
         std::string const filename("extra-text.xml");
@@ -522,7 +523,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("tag after closing root tag")
+    CATCH_START_SECTION("parser_errors: tag after closing root tag")
     {
         std::stringstream ss;
         std::string const filename("extra-text.xml");
@@ -542,7 +543,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("not closing root tag")
+    CATCH_START_SECTION("parser_errors: not closing root tag")
     {
         std::stringstream ss;
         std::string const filename("root-still-open.xml");
@@ -561,7 +562,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("attribute expects identifier")
+    CATCH_START_SECTION("parser_errors: attribute expects identifier")
     {
         std::stringstream ss;
         std::string const filename("attribute-identifier.xml");
@@ -578,7 +579,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("attribute missing equal")
+    CATCH_START_SECTION("parser_errors: attribute missing equal")
     {
         std::stringstream ss;
         std::string const filename("attribute-identifier.xml");
@@ -595,7 +596,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("attribute value must be string")
+    CATCH_START_SECTION("parser_errors: attribute value must be string")
     {
         std::stringstream ss;
         std::string const filename("attribute-identifier.xml");
@@ -612,7 +613,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("attribute defined twice")
+    CATCH_START_SECTION("parser_errors: attribute defined twice")
     {
         std::stringstream ss;
         std::string const filename("attribute-duplicated.xml");
@@ -629,7 +630,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("processor not ended")
+    CATCH_START_SECTION("parser_errors: processor not ended")
     {
         std::stringstream ss;
         std::string const filename("attribute-duplicated.xml");
@@ -646,7 +647,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("element definitions not supported")
+    CATCH_START_SECTION("parser_errors: element definitions not supported")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -663,7 +664,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("bad CDATA introducer")
+    CATCH_START_SECTION("parser_errors: bad CDATA introducer")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -680,7 +681,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("EOF before closing CDATA tag")
+    CATCH_START_SECTION("parser_errors: EOF before closing CDATA tag")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -697,7 +698,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("EOF before closing comment tag")
+    CATCH_START_SECTION("parser_errors: EOF before closing comment tag")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -714,7 +715,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("unknown <!... sequence")
+    CATCH_START_SECTION("parser_errors: unknown <!... sequence")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -731,7 +732,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("closing tag missing name")
+    CATCH_START_SECTION("parser_errors: closing tag missing name")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -748,7 +749,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("closing tag not starting with alpha character")
+    CATCH_START_SECTION("parser_errors: closing tag not starting with alpha character")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -765,7 +766,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("closing tag missing >")
+    CATCH_START_SECTION("parser_errors: closing tag missing >")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -782,7 +783,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("closing tag name followed by ';'")
+    CATCH_START_SECTION("parser_errors: closing tag name followed by ';'")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -799,7 +800,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("opening tag missing >")
+    CATCH_START_SECTION("parser_errors: opening tag missing >")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -816,7 +817,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("opening tag bad name")
+    CATCH_START_SECTION("parser_errors: opening tag bad name")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -833,7 +834,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("opening tag name followed by ';'")
+    CATCH_START_SECTION("parser_errors: opening tag name followed by ';'")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -850,7 +851,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("attribute with '<'")
+    CATCH_START_SECTION("parser_errors: attribute with '<'")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -867,7 +868,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty entity (&;)")
+    CATCH_START_SECTION("parser_errors: empty entity (&;)")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -884,7 +885,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty numeric entity (&#;)")
+    CATCH_START_SECTION("parser_errors: empty numeric entity (&#;)")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -901,7 +902,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("invalid number of numeric entity (not decimal)")
+    CATCH_START_SECTION("parser_errors: invalid number of numeric entity (not decimal)")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -918,7 +919,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("invalid number of numeric entity (not hexadecimal)")
+    CATCH_START_SECTION("parser_errors: invalid number of numeric entity (not hexadecimal)")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -935,7 +936,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("\"unknown\" entity")
+    CATCH_START_SECTION("parser_errors: \"unknown\" entity")
     {
         std::stringstream ss;
         std::string const filename("element.xml");
@@ -952,7 +953,7 @@ CATCH_TEST_CASE("parser_errors", "[parser][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("separate attributes with a slash")
+    CATCH_START_SECTION("parser_errors: separate attributes with a slash")
     {
         std::stringstream ss;
         std::string const filename("element.xml");

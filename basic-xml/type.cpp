@@ -22,6 +22,22 @@
  *
  * Each table uses one or more files. Each file is handled by a dbfile
  * object and a corresponding set of blocks.
+ *
+ * \todo
+ * Note:
+ * \todo
+ * Document authors are encouraged to avoid "compatibility characters", as
+ * defined in section 2.3 of [Unicode]. The characters defined in the
+ * following ranges are also discouraged. They are either control
+ * characters or permanently undefined Unicode characters:
+ * \todo
+ *     [#x7F-#x84], [#x86-#x9F], [#xFDD0-#xFDEF],
+ *     [#x1FFFE-#x1FFFF], [#x2FFFE-#x2FFFF], [#x3FFFE-#x3FFFF],
+ *     [#x4FFFE-#x4FFFF], [#x5FFFE-#x5FFFF], [#x6FFFE-#x6FFFF],
+ *     [#x7FFFE-#x7FFFF], [#x8FFFE-#x8FFFF], [#x9FFFE-#x9FFFF],
+ *     [#xAFFFE-#xAFFFF], [#xBFFFE-#xBFFFF], [#xCFFFE-#xCFFFF],
+ *     [#xDFFFE-#xDFFFF], [#xEFFFE-#xEFFFF], [#xFFFFE-#xFFFFF],
+ *     [#x10FFFE-#x10FFFF].
  */
 
 // self
@@ -32,6 +48,11 @@
 // libutf8
 //
 #include    <libutf8/iterator.h>
+
+
+// C++
+//
+#include    <iostream>
 
 
 // last include
@@ -58,7 +79,7 @@ struct char_range_t
 
     bool operator < (char_range_t const & rhs) const
     {
-        return f_first < rhs.f_first;
+        return f_last < rhs.f_first;
     }
 };
 
@@ -68,7 +89,7 @@ constexpr char_range_t const g_name_start_char[] =
     { 0x00003A, 0x00003A },     // :
     { 0x000041, 0x00005A },     // A-Z
     { 0x00005F, 0x00005F },     // _
-    { 0x000061, 0x00006A },     // a-z
+    { 0x000061, 0x00007A },     // a-z
     { 0x0000C0, 0x0000D6 },
     { 0x0000D8, 0x0000F6 },
     { 0x0000F8, 0x0002FF },
@@ -86,86 +107,72 @@ constexpr char_range_t const g_name_start_char[] =
 constexpr char_range_t const g_name_char[] =
 {
     { 0x00002D, 0x00002E },     // --.
-    { 0x000030, 0x000039 },     // 0-9
+    { 0x000030, 0x00003A },     // 0-:
+    { 0x000041, 0x00005A },     // A-Z
+    { 0x00005F, 0x00005F },     // _
+    { 0x000061, 0x00007A },     // a-z
     { 0x0000B7, 0x0000B7 },     // bullet point
-    { 0x000300, 0x00036F },
+    { 0x0000C0, 0x0000D6 },
+    { 0x0000D8, 0x0000F6 },
+    { 0x0000F8, 0x0002FF },
+    { 0x000300, 0x00037D },
+    { 0x00037F, 0x001FFF },
+    { 0x00200C, 0x00200D },
     { 0x00203F, 0x002040 },
+    { 0x002070, 0x00218F },
+    { 0x002C00, 0x002FEF },
+    { 0x003001, 0x00D7FF },
+    { 0x00F900, 0x00FDCF },
+    { 0x00FDF0, 0x00FFFD },
+    { 0x010000, 0x0EFFFF },     // forbid all FFFE & FFFF?
 };
 
+
+bool find_char(char32_t c, char_range_t const * b, char_range_t const * e)
+{
+    char_range_t r = { c, c };
+    auto range(std::lower_bound(b, e, r));
+//std::cout << std::flush;
+//std::cout << "--- searched character " << std::hex << "0x" << static_cast<int>(c) << " -> found range: 0x"
+//<< (range == e ? '?' : static_cast<int>(range->f_first)) << " ... 0x"
+//<< (range == e ? '?' : static_cast<int>(range->f_last))
+//<< std::endl;
+    return range != e && c >= range->f_first && c <= range->f_last;
+}
 
 
 } // no name namespace
 
 
 
-bool is_alpha(char c)
+bool is_name_start_char(char32_t c)
 {
-    return (c >= 'a' && c <= 'z')
-        || (c >= 'A' && c <= 'Z')
-        || c == '_';
+    return find_char(c, std::begin(g_name_start_char), std::end(g_name_start_char));
 }
 
 
-bool is_digit(char c)
+bool is_name_char(char32_t c)
 {
-    return (c >= '0' && c <= '9')
-        || c == '-';
+    return find_char(c, std::begin(g_name_char), std::end(g_name_char));
 }
 
 
-bool is_space(char c)
+bool is_digit(char32_t c)
 {
-    return c == ' '
-        || c == '\t'
-        || c == '\v'
-        || c == '\f'
-        || c == '\n'
-        || c == '\r';
+    return (c >= U'0' && c <= U'9')
+        || c == U'-';
 }
 
 
-/** \brief Check whether a token is considered valid.
- *
- * This function checks whether a name represents an ASCII token. This
- * is used to make it simpler, to accept tokens that are simpler to use
- * in languages (i.e. like a name field in a structure).
- *
- * The is_token() function, on the other hand, allows many more characters
- * which means that a token can more easily not be compatible with a
- * standard language such as JavaScript.
- *
- * \param[in] token  The token to be checked.
- *
- * \return true if \p token is considered valid.
- */
-bool is_ascii_token(std::string const & token)
+bool is_space(char32_t c)
 {
-    if(token.empty())
-    {
-        return false;
-    }
-
-    if(!is_alpha(token[0]))
-    {
-        return false;
-    }
-
-    std::string::size_type const max(token.length());
-    for(std::string::size_type idx(1); idx < max; ++idx)
-    {
-        char const c(token[idx]);
-        if(!is_alpha(c)
-        && !is_digit(c))
-        {
-            return false;
-        }
-    }
-    if(token[max - 1] == '-')
-    {
-        return false;
-    }
-
-    return true;
+    // the XML reference clearly defines the following as white spaces
+    // other Unicode what spaces are not considered as such in XML documents
+    //
+    return c == U' '
+        || c == U'\t'
+        || c == U'\n'
+        || c == U'\r';
 }
 
 
@@ -199,30 +206,19 @@ bool is_token(std::string const & token)
         return false;
     }
 
-    // here it != token.end() is always true since the token is not empty
-    //
     libutf8::utf8_iterator it(token);
 
-    char_range_t c = { *it, U'\0' };
-    auto range(std::lower_bound(
-          std::begin(g_name_start_char)
-        , std::end(g_name_start_char)
-        , c));
-    if(range == std::end(g_name_start_char)
-    || c.f_last > range->f_last)
+    // here it != token.end() is always true since the token is not empty
+    // so there is no need to check that again
+    //
+    if(!is_name_start_char(*it))
     {
         return false;
     }
 
     for(++it; it != token.end(); ++it)
     {
-        c = { *it, U'\0' };
-        range = std::lower_bound(
-              std::begin(g_name_char)
-            , std::end(g_name_char)
-            , c);
-        if(range == std::end(g_name_char)
-        || c.f_last > range->f_last)
+        if(!is_name_char(*it))
         {
             return false;
         }

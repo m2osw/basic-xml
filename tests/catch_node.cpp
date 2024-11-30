@@ -16,22 +16,28 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// basic-xml
+//
+#include    <basic-xml/node.h>
+
+#include    <basic-xml/exception.h>
+#include    <basic-xml/type.h>
+
+
 // self
 //
 #include    "catch_main.h"
 
 
-// basic-xml
+// libutf8
 //
-#include    <basic-xml/exception.h>
-#include    <basic-xml/node.h>
-#include    <basic-xml/type.h>
+#include    <libutf8/libutf8.h>
 
 
 
 CATCH_TEST_CASE("node", "[node][valid]")
 {
-    CATCH_START_SECTION("basic node")
+    CATCH_START_SECTION("node: basic node")
     {
         basic_xml::node n("root");
         CATCH_REQUIRE(n.tag_name() == "root");
@@ -63,7 +69,7 @@ CATCH_TEST_CASE("node", "[node][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("node tree")
+    CATCH_START_SECTION("node: node tree")
     {
         basic_xml::node::pointer_t root(std::make_shared<basic_xml::node>("root"));
         CATCH_REQUIRE(root->tag_name() == "root");
@@ -208,7 +214,7 @@ CATCH_TEST_CASE("node", "[node][valid]")
 
 CATCH_TEST_CASE("node_output", "[node][valid]")
 {
-    CATCH_START_SECTION("convert string with entities")
+    CATCH_START_SECTION("node_output: convert string with entities")
     {
         CATCH_REQUIRE(basic_xml::convert_to_entity("nothing to convert", "<>&") == "nothing to convert");
 
@@ -218,7 +224,7 @@ CATCH_TEST_CASE("node_output", "[node][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("node output")
+    CATCH_START_SECTION("node_output: node output")
     {
         basic_xml::node n("root");
         CATCH_REQUIRE(n.tag_name() == "root");
@@ -232,7 +238,7 @@ CATCH_TEST_CASE("node_output", "[node][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("node tree output")
+    CATCH_START_SECTION("node_output: node tree output")
     {
         basic_xml::node::pointer_t root(std::make_shared<basic_xml::node>("root"));
         root->set_attribute("even-root", "can have an \"attribute\"");
@@ -270,7 +276,7 @@ CATCH_TEST_CASE("node_output", "[node][valid]")
 
 CATCH_TEST_CASE("node_errors", "[node][invalid]")
 {
-    CATCH_START_SECTION("bad tag name: empty")
+    CATCH_START_SECTION("node_errors: bad tag name -- empty")
     {
         CATCH_REQUIRE_THROWS_MATCHES(
                   basic_xml::node(std::string())
@@ -280,45 +286,43 @@ CATCH_TEST_CASE("node_errors", "[node][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("bad tag name: invalid character in name")
+    CATCH_START_SECTION("node_errors: bad tag name -- invalid character in name")
     {
         for(int count(0); count < 10; ++count)
         {
+            char32_t wc(U'\0');
+
+            // generate a valid tag name
+            //
             std::string tag_name;
             int max(rand() % 10 + 10);
             for(int len(0); len < max; ++len)
             {
-                switch(rand() % (tag_name.empty() ? 3 : 5))
+                if(tag_name.empty())
                 {
-                case 0:
-                    tag_name += static_cast<char>(rand() % 26 + 'a');
-                    break;
-
-                case 1:
-                    tag_name += static_cast<char>(rand() % 26 + 'A');
-                    break;
-
-                case 2:
-                    tag_name += '_';
-                    break;
-
-                case 3:
-                    tag_name += static_cast<char>(rand() % 10 + '0');
-                    break;
-
-                case 4:
-                    tag_name += '-';
-                    break;
-
+                    wc = SNAP_CATCH2_NAMESPACE::random_char(SNAP_CATCH2_NAMESPACE::character_t::CHARACTER_ZUNICODE);
+                    while(!basic_xml::is_name_start_char(wc))
+                    {
+                        wc = SNAP_CATCH2_NAMESPACE::random_char(SNAP_CATCH2_NAMESPACE::character_t::CHARACTER_ZUNICODE);
+                    }
                 }
+                else
+                {
+                    wc = SNAP_CATCH2_NAMESPACE::random_char(SNAP_CATCH2_NAMESPACE::character_t::CHARACTER_ZUNICODE);
+                    while(!basic_xml::is_name_char(wc))
+                    {
+                        wc = SNAP_CATCH2_NAMESPACE::random_char(SNAP_CATCH2_NAMESPACE::character_t::CHARACTER_ZUNICODE);
+                    }
+                }
+                tag_name += wc;
             }
 
             // invalid if it does not start with an alpha character
             //
-            char start(rand() % 255 + 1);
-            while(basic_xml::is_alpha(start))
+            char32_t start(SNAP_CATCH2_NAMESPACE::random_char(SNAP_CATCH2_NAMESPACE::character_t::CHARACTER_ZUNICODE));
+            while(basic_xml::is_name_start_char(start))
             {
-                start = rand() % 255 + 1;
+                start = SNAP_CATCH2_NAMESPACE::random_char(SNAP_CATCH2_NAMESPACE::character_t::CHARACTER_ZUNICODE);
             }
             CATCH_REQUIRE_THROWS_MATCHES(
                       basic_xml::node(start + tag_name)
@@ -328,24 +332,14 @@ CATCH_TEST_CASE("node_errors", "[node][invalid]")
                             + (start + tag_name)
                             + "\" is not a valid token for a tag name."));
 
-            // invalid if it ends with '-'
-            //
-            CATCH_REQUIRE_THROWS_MATCHES(
-                      basic_xml::node(tag_name + '-')
-                    , basic_xml::invalid_token
-                    , Catch::Matchers::ExceptionMessage(
-                              "xml_error: \""
-                            + tag_name
-                            + "-\" is not a valid token for a tag name."));
-
             // invalid if invalid char anywhere within
             //
             for(size_t pos(0); pos <= tag_name.length(); ++pos)
             {
-                char mid(rand() % 255 + 1);
-                while(basic_xml::is_alpha(mid) || basic_xml::is_digit(mid))
+                char32_t mid(SNAP_CATCH2_NAMESPACE::random_char(SNAP_CATCH2_NAMESPACE::character_t::CHARACTER_ZUNICODE));
+                while(basic_xml::is_name_char(mid))
                 {
-                    mid = rand() % 255 + 1;
+                    mid = SNAP_CATCH2_NAMESPACE::random_char(SNAP_CATCH2_NAMESPACE::character_t::CHARACTER_ZUNICODE);
                 }
                 std::string bad_name(
                           tag_name.substr(0, pos)
@@ -363,7 +357,7 @@ CATCH_TEST_CASE("node_errors", "[node][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("bad attribute name: invalid character in name")
+    CATCH_START_SECTION("node_errors: bad attribute name -- invalid character in name")
     {
         basic_xml::node n("tag");
 
@@ -401,7 +395,7 @@ CATCH_TEST_CASE("node_errors", "[node][invalid]")
             // invalid if it does not start with an alpha character
             //
             char start(rand() % 255 + 1);
-            while(basic_xml::is_alpha(start))
+            while(basic_xml::is_name_start_char(start))
             {
                 start = rand() % 255 + 1;
             }
@@ -413,22 +407,12 @@ CATCH_TEST_CASE("node_errors", "[node][invalid]")
                             + (start + attribute_name)
                             + "\" is not a valid token for an attribute name."));
 
-            // invalid if it ends with '-'
-            //
-            CATCH_REQUIRE_THROWS_MATCHES(
-                      n.set_attribute(attribute_name + '-', "value")
-                    , basic_xml::invalid_token
-                    , Catch::Matchers::ExceptionMessage(
-                              "xml_error: \""
-                            + attribute_name
-                            + "-\" is not a valid token for an attribute name."));
-
             // invalid if invalid char anywhere within
             //
             for(size_t pos(0); pos <= attribute_name.length(); ++pos)
             {
                 char mid(rand() % 255 + 1);
-                while(basic_xml::is_alpha(mid) || basic_xml::is_digit(mid))
+                while(basic_xml::is_name_char(mid))
                 {
                     mid = rand() % 255 + 1;
                 }
@@ -448,7 +432,7 @@ CATCH_TEST_CASE("node_errors", "[node][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("re-append a child fails")
+    CATCH_START_SECTION("node_errors: re-append a child fails")
     {
         basic_xml::node::pointer_t root(std::make_shared<basic_xml::node>("top"));
 

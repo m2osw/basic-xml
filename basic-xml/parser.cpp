@@ -34,6 +34,7 @@
 
 // libutf8
 //
+#include    <libutf8/base.h>
 #include    <libutf8/libutf8.h>
 
 
@@ -270,10 +271,10 @@ parser::token_t parser::get_token(bool parsing_attributes)
 
     for(;;)
     {
-        int c(getc());
+        char32_t c(getc());
         switch(c)
         {
-        case EOF:
+        case static_cast<char32_t>(EOF):
             return token_t::TOK_EOF;
 
         case ' ':
@@ -298,7 +299,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
                 for(;;)
                 {
                     c = getc();
-                    if(c == EOF)
+                    if(c == static_cast<char32_t>(EOF))
                     {
                         throw unexpected_eof(
                               f_filename
@@ -315,14 +316,15 @@ parser::token_t parser::get_token(bool parsing_attributes)
                         }
                         f_value += '?';
                     }
-                    f_value += static_cast<char>(c);
+                    f_value += libutf8::to_u8string(c);
                 }
                 snapdev::NOT_REACHED();
                 return token_t::TOK_PROCESSOR;
 
             case '!':
                 c = getc();
-                if(is_alpha(c))
+                if((c >= 'A' && c <= 'Z')
+                || (c >= 'a' && c <= 'z'))
                 {
                     // of course, this may be anything other than an element but still something we don't support
                     //
@@ -336,7 +338,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
                 {
                     // <![CDATA[ ... or throw
                     //
-                    char const * expected = "CDATA[";
+                    char32_t const * expected = U"CDATA[";
                     for(int j(0); j < 6; ++j)
                     {
                         if(getc() != expected[j])
@@ -351,7 +353,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
                     for(;;)
                     {
                         c = getc();
-                        if(c == EOF)
+                        if(c == static_cast<char32_t>(EOF))
                         {
                             throw unexpected_eof(
                                   f_filename
@@ -378,17 +380,17 @@ parser::token_t parser::get_token(bool parsing_attributes)
                                     return token_t::TOK_TEXT;
                                 }
                                 f_value += "]]";
-                                f_value += static_cast<char>(c);
+                                f_value += libutf8::to_u8string(c);
                             }
                             else
                             {
                                 f_value += ']';
-                                f_value += static_cast<char>(c);
+                                f_value += libutf8::to_u8string(c);
                             }
                         }
                         else
                         {
-                            f_value += static_cast<char>(c);
+                            f_value += libutf8::to_u8string(c);
                         }
                     }
                 }
@@ -404,7 +406,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
                         while(!found)
                         {
                             c = getc();
-                            if(c == EOF)
+                            if(c == static_cast<char32_t>(EOF))
                             {
                                 throw unexpected_eof(
                                       f_filename
@@ -434,7 +436,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
                         + ':'
                         + std::to_string(f_line)
                         + std::string(": character '")
-                        + static_cast<char>(c) // TODO: better support UTF-8
+                        + libutf8::to_u8string(c)
                         + "' was not expected after a \"<!\" sequence.");
 
             case '/':
@@ -443,9 +445,9 @@ parser::token_t parser::get_token(bool parsing_attributes)
                 {
                     c = getc();
                 }
-                if(!is_alpha(c))
+                if(!is_name_start_char(c))
                 {
-                    if(c == EOF)
+                    if(c == static_cast<char32_t>(EOF))
                     {
                         throw unexpected_eof(
                               f_filename
@@ -458,15 +460,14 @@ parser::token_t parser::get_token(bool parsing_attributes)
                             + ':'
                             + std::to_string(f_line)
                             + ": character '"
-                            + static_cast<char>(c)
+                            + libutf8::to_u8string(c)
                             + "' is not valid for a tag name.");
                 }
                 for(;;)
                 {
-                    f_value += static_cast<char>(c);
+                    f_value += libutf8::to_u8string(c);
                     c = getc();
-                    if(!is_alpha(c)
-                    && !is_digit(c))
+                    if(!is_name_char(c))
                     {
                         break;
                     }
@@ -477,7 +478,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
                 }
                 if(c != '>')
                 {
-                    if(c == EOF)
+                    if(c == static_cast<char32_t>(EOF))
                     {
                         throw unexpected_eof(
                               f_filename
@@ -504,9 +505,9 @@ parser::token_t parser::get_token(bool parsing_attributes)
             {
                 c = getc();
             }
-            if(!is_alpha(c))
+            if(!is_name_start_char(c))
             {
-                if(c == EOF)
+                if(c == static_cast<char32_t>(EOF))
                 {
                     throw unexpected_eof(
                           f_filename
@@ -519,15 +520,14 @@ parser::token_t parser::get_token(bool parsing_attributes)
                         + ':'
                         + std::to_string(f_line)
                         + ": character '"
-                        + static_cast<char>(c)
+                        + libutf8::to_u8string(c)
                         + "' is not valid for a tag name.");
             }
             for(;;)
             {
-                f_value += static_cast<char>(c);
+                f_value += libutf8::to_u8string(c);
                 c = getc();
-                if(!is_alpha(c)
-                && !is_digit(c))
+                if(!is_name_char(c))
                 {
                     break;
                 }
@@ -547,7 +547,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
                         + ':'
                         + std::to_string(f_line)
                         + ": character '"
-                        + static_cast<char>(c)
+                        + libutf8::to_u8string(c)
                         + "' is not valid right after a tag name.");
             }
             ungetc(c);
@@ -584,7 +584,7 @@ parser::token_t parser::get_token(bool parsing_attributes)
         case '\'':
             if(parsing_attributes)
             {
-                int quote(c);
+                auto quote(c);
                 for(;;)
                 {
                     c = getc();
@@ -601,35 +601,36 @@ parser::token_t parser::get_token(bool parsing_attributes)
                             + std::to_string(f_line)
                             + ": character '>' not expected inside a tag value; please use \"&gt;\" instead.");
                     }
-                    f_value += static_cast<char>(c);
+                    f_value += libutf8::to_u8string(c);
                 }
+                snapdev::NOT_REACHED();
             }
             break;
 
         }
 
         if(parsing_attributes
-        && is_alpha(c))
+        && is_name_char(c))
         {
             for(;;)
             {
-                f_value += static_cast<char>(c);
+                f_value += libutf8::to_u8string(c);
                 c = getc();
-                if(!is_alpha(c)
-                && !is_digit(c))
+                if(!is_name_char(c))
                 {
                     ungetc(c);
                     return token_t::TOK_IDENTIFIER;
                 }
             }
+            snapdev::NOT_REACHED();
         }
 
         for(;;)
         {
-            f_value += static_cast<char>(c);
+            f_value += libutf8::to_u8string(c);
             c = getc();
             if(c == '<'
-            || c == EOF)
+            || c == static_cast<decltype(c)>(EOF))
             {
                 ungetc(c);
                 unescape_entities();
@@ -744,7 +745,7 @@ void parser::unescape_entities()
 }
 
 
-int parser::getc()
+char32_t parser::getc()
 {
     if(f_ungetc_pos > 0)
     {
@@ -768,15 +769,47 @@ int parser::getc()
         ++f_line;
     }
 
-    return c;
+    if(c >= 0x80)
+    {
+        // define the number of bytes required (assuming valid UTF-8)
+        //
+        std::size_t const count(c < 0xE0 ? 2UL : (c < 0xF0 ? 3UL : 4UL));
+        char input[5];
+        input[0] = c;
+        std::size_t len(1);
+        for(; len < count; ++len)
+        {
+            c = f_in.get();
+            if(c < 0x80 || c >= 0xC0)
+            {
+                // not valid, at least don't eat the next byte improperly
+                //
+                ungetc(c);
+                break;
+            }
+            input[len] += c;
+        }
+        input[len] = '\0';
+        char32_t result(U'\0');
+        char * s(input);
+        if(libutf8::mbstowc(result, s, len) == -1)
+        {
+            return U'\xFFFD';
+        }
+        return result;
+    }
+    else
+    {
+        return c;
+    }
 }
 
 
-void parser::ungetc(int c)
+void parser::ungetc(char32_t c)
 {
-    if(c != EOF)
+    if(c != static_cast<char32_t>(EOF))
     {
-        if(f_ungetc_pos >= sizeof(f_ungetc) / sizeof(f_ungetc[0]))
+        if(f_ungetc_pos >= std::size(f_ungetc))
         {
             // LCOV_EXCL_START
             throw logic_error(

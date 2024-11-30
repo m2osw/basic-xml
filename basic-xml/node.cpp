@@ -41,6 +41,11 @@
 #include    <snapdev/trim_string.h>
 
 
+// C++
+//
+#include    <iomanip>
+
+
 // last include
 //
 #include    <snapdev/poison.h>

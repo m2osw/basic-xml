@@ -65,13 +65,13 @@ private:
     token_t             read_tag_attributes(node::pointer_t & tag);
     token_t             get_token(bool parsing_attributes);
     void                unescape_entities();
-    int                 getc();
-    void                ungetc(int c);
+    char32_t            getc();
+    void                ungetc(char32_t c);
 
     std::string         f_filename = std::string();
     std::istream &      f_in;
-    size_t              f_ungetc_pos = 0;
-    int                 f_ungetc[4] = { '\0' };
+    std::size_t         f_ungetc_pos = 0;
+    char32_t            f_ungetc[4] = { '\0' };
     int                 f_line = 1;
     std::string         f_value = std::string();
 };

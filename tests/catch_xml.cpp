@@ -16,15 +16,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// basic-xml
+//
+#include    <basic-xml/xml.h>
+
+#include    <basic-xml/exception.h>
+
+
 // self
 //
 #include    "catch_main.h"
-
-
-// basic-xml
-//
-#include    <basic-xml/exception.h>
-#include    <basic-xml/xml.h>
 
 
 // C++
@@ -35,7 +36,7 @@
 
 CATCH_TEST_CASE("xml", "[xml][valid]")
 {
-    CATCH_START_SECTION("empty root")
+    CATCH_START_SECTION("xml: empty root")
     {
         std::string const xml_path(SNAP_CATCH2_NAMESPACE::get_folder_name());
         std::string const filename(xml_path + "/empty-tag.xml");
@@ -62,7 +63,7 @@ CATCH_TEST_CASE("xml", "[xml][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root with preprocessor")
+    CATCH_START_SECTION("xml: empty root with preprocessor")
     {
         std::string const filename("empty-tag.xml");
 
@@ -84,7 +85,7 @@ CATCH_TEST_CASE("xml", "[xml][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root with comment & preprocessor")
+    CATCH_START_SECTION("xml: empty root with comment & preprocessor")
     {
         std::string const xml_path(SNAP_CATCH2_NAMESPACE::get_folder_name());
         std::string const filename(xml_path + "/quite-empty.xml");
@@ -111,7 +112,7 @@ CATCH_TEST_CASE("xml", "[xml][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root with comment & preprocessor & attributes")
+    CATCH_START_SECTION("xml: empty root with comment & preprocessor & attributes")
     {
         std::string const xml_path(SNAP_CATCH2_NAMESPACE::get_folder_name());
         std::string const filename(xml_path + "/root-attributes.xml");
@@ -150,7 +151,7 @@ CATCH_TEST_CASE("xml", "[xml][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("entities test")
+    CATCH_START_SECTION("xml: entities test")
     {
         std::string const xml_path(SNAP_CATCH2_NAMESPACE::get_folder_name());
         std::string const filename(xml_path + "/entities.xml");
@@ -189,9 +190,9 @@ CATCH_TEST_CASE("xml", "[xml][valid]")
 }
 
 
-CATCH_TEST_CASE("xml", "[xml][invalid]")
+CATCH_TEST_CASE("xml_errors", "[xml][invalid]")
 {
-    CATCH_START_SECTION("file missing")
+    CATCH_START_SECTION("xml_errors: file missing")
     {
         std::string const xml_path(SNAP_CATCH2_NAMESPACE::get_folder_name());
         std::string const filename(xml_path + "/file-does-not-exist.xml");
@@ -208,7 +209,7 @@ CATCH_TEST_CASE("xml", "[xml][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("file no permission")
+    CATCH_START_SECTION("xml_errors: file no permission")
     {
         std::string const filename("/root/.bashrc");
 
@@ -224,7 +225,7 @@ CATCH_TEST_CASE("xml", "[xml][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("parse empty xml file")
+    CATCH_START_SECTION("xml_errors: parse empty xml file")
     {
         std::string const xml_path(SNAP_CATCH2_NAMESPACE::get_folder_name());
         std::string const filename(xml_path + "/empty.xml");
@@ -246,7 +247,7 @@ CATCH_TEST_CASE("xml", "[xml][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("empty root tag")
+    CATCH_START_SECTION("xml_errors: empty root tag")
     {
         std::string const filename("empty-tag.xml");
 

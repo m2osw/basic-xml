@@ -35,10 +35,10 @@ namespace basic_xml
 
 
 
-bool is_alpha(char c);
-bool is_digit(char c);
-bool is_space(char c);
-bool is_ascii_token(std::string const & token);
+bool is_name_start_char(char32_t c);
+bool is_name_char(char32_t c);
+bool is_digit(char32_t c);
+bool is_space(char32_t c);
 bool is_token(std::string const & token);
 
 

@@ -1,5 +1,5 @@
 
 # TODO
 
-* We do not currently support UTF-8 whitespaces
+* Finish conversion to UTF-8 (i.e. many of the tests still use 'char', etc.)
 

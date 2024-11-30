@@ -16,39 +16,115 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+// basic-xml
+//
+#include    <basic-xml/type.h>
+
+#include    <basic-xml/exception.h>
+
+
 // self
 //
 #include    "catch_main.h"
 
 
-// basic-xml
+// libutf8
 //
-#include    <basic-xml/exception.h>
-#include    <basic-xml/type.h>
+#include    <libutf8/libutf8.h>
+
+
+
+namespace
+{
+
+
+bool is_xml_alpha_start(char32_t c)
+{
+    return c == ':'
+        || (c >= 'A' && c <= 'Z')
+        || c == '_'
+        || (c >= 'a' && c <= 'z')
+        || (c >= U'\x0000C0' && c <= U'\x0000D6') // TBD: use Unicode character names?
+        || (c >= U'\x0000D8' && c <= U'\x0000F6')
+        || (c >= U'\x0000F8' && c <= U'\x0002FF')
+        || (c >= U'\x000370' && c <= U'\x00037D')
+        || (c >= U'\x00037F' && c <= U'\x001FFF')
+        || (c >= U'\x00200C' && c <= U'\x00200D')
+        || (c >= U'\x002070' && c <= U'\x00218F')
+        || (c >= U'\x002C00' && c <= U'\x002FEF')
+        || (c >= U'\x003001' && c <= U'\x00D7FF')
+        || (c >= U'\x00F900' && c <= U'\x00FDCF')
+        || (c >= U'\x00FDF0' && c <= U'\x00FFFD')
+        || (c >= U'\x010000' && c <= U'\x0EFFFF');
+}
+
+
+bool is_xml_alpha(char32_t c)
+{
+    return c == '-'
+        || c == '.'
+        || (c >= '0' && c <= '9')
+        || c == ':'
+        || (c >= 'A' && c <= 'Z')
+        || c == '_'
+        || (c >= 'a' && c <= 'z')
+        || c == U'\x0000B7'
+        || (c >= U'\x0000C0' && c <= U'\x0000D6') // TBD: use Unicode character names?
+        || (c >= U'\x0000D8' && c <= U'\x0000F6')
+        || (c >= U'\x0000F8' && c <= U'\x0002FF')
+        || (c >= U'\x000300' && c <= U'\x00037D')
+        || (c >= U'\x00037F' && c <= U'\x001FFF')
+        || (c >= U'\x00200C' && c <= U'\x00200D')
+        || (c >= U'\x00203F' && c <= U'\x002040')
+        || (c >= U'\x002070' && c <= U'\x00218F')
+        || (c >= U'\x002C00' && c <= U'\x002FEF')
+        || (c >= U'\x003001' && c <= U'\x00D7FF')
+        || (c >= U'\x00F900' && c <= U'\x00FDCF')
+        || (c >= U'\x00FDF0' && c <= U'\x00FFFD')
+        || (c >= U'\x010000' && c <= U'\x0EFFFF');
+}
+
+
+
+} // no name namespace
 
 
 
 CATCH_TEST_CASE("types", "[type][valid]")
 {
-    CATCH_START_SECTION("is_alpha")
+    CATCH_START_SECTION("types: is_name_start_char()")
     {
-        for(int c(0); c < 256; ++c)
+        for(char32_t c(0); c < 0x110000; ++c)
         {
-            if((c >= 'a' && c <= 'z')
-            || (c >= 'A' && c <= 'Z')
-            || c == '_')
+            if(is_xml_alpha_start(c))
             {
-                CATCH_REQUIRE(basic_xml::is_alpha(c));
+                CATCH_REQUIRE(basic_xml::is_name_start_char(c));
             }
             else
             {
-                CATCH_REQUIRE_FALSE(basic_xml::is_alpha(c));
+                CATCH_REQUIRE_FALSE(basic_xml::is_name_start_char(c));
             }
         }
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("is_digit")
+    CATCH_START_SECTION("types: is_name_char()")
+    {
+        for(char32_t c(0); c < 0x110000; ++c)
+        {
+            if(is_xml_alpha(c))
+            {
+                CATCH_REQUIRE(basic_xml::is_name_char(c));
+            }
+            else
+            {
+                CATCH_REQUIRE_FALSE(basic_xml::is_name_char(c));
+            }
+        }
+    }
+    CATCH_END_SECTION()
+
+    CATCH_START_SECTION("types: is_digit()")
     {
         for(int c(0); c < 256; ++c)
         {
@@ -65,7 +141,7 @@ CATCH_TEST_CASE("types", "[type][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("is_space")
+    CATCH_START_SECTION("types: is_space()")
     {
         for(int c(0); c < 256; ++c)
         {
@@ -73,8 +149,6 @@ CATCH_TEST_CASE("types", "[type][valid]")
             {
             case ' ':
             case '\t':
-            case '\v':
-            case '\f':
             case '\n':
             case '\r':
                 CATCH_REQUIRE(basic_xml::is_space(c));
@@ -89,7 +163,7 @@ CATCH_TEST_CASE("types", "[type][valid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("is_token -- last cannot be '-'")
+    CATCH_START_SECTION("types: is_token()")
     {
         for(int count(0); count < 10; ++count)
         {
@@ -99,7 +173,7 @@ CATCH_TEST_CASE("types", "[type][valid]")
             for(int len(0); len < max || more; ++len)
             {
                 more = false;
-                switch(rand() % (token.empty() ? 3 : 5))
+                switch(rand() % (token.empty() ? 4 : 6))
                 {
                 case 0:
                     token += static_cast<char>(rand() % 26 + 'a');
@@ -114,10 +188,14 @@ CATCH_TEST_CASE("types", "[type][valid]")
                     break;
 
                 case 3:
-                    token += static_cast<char>(rand() % 10 + '0');
+                    token += ':';   // this is a strange one, it should only be used for namespaces, but it is allowed as per the reference
                     break;
 
                 case 4:
+                    token += static_cast<char>(rand() % 10 + '0');
+                    break;
+
+                case 5:
                     token += '-';
                     more = true; // do not end with '-'
                     break;
@@ -135,23 +213,30 @@ CATCH_TEST_CASE("types", "[type][valid]")
 
 CATCH_TEST_CASE("invalid_tokens", "[type][invalid]")
 {
-    CATCH_START_SECTION("is_token -- empty")
+    CATCH_START_SECTION("invalid_tokens: is_token -- empty")
     {
         CATCH_REQUIRE_FALSE(basic_xml::is_token(std::string()));
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("is_token -- 1st must be alpha")
+    CATCH_START_SECTION("invalid_tokens: is_token -- 1st must be alpha")
     {
-        for(int c(1); c < 256; ++c)
+        for(char32_t c(1); c < 0x110000; ++c)
         {
-            if(basic_xml::is_alpha(c))
+            if(c >= 0xD800 && c <= 0xDFFF)
+            {
+                // those are not characters, so don't bother (the libutf8::to_u8string() will fail
+                // here and would fail there but more or less we can't pass those in UTF-8)
+                //
+                continue;
+            }
+            if(is_xml_alpha(c))
             {
                 continue;
             }
 
             std::string token;
-            token += static_cast<char>(c);
+            token += libutf8::to_u8string(c);
 
             CATCH_REQUIRE_FALSE(basic_xml::is_token(token));
 
@@ -174,11 +259,18 @@ CATCH_TEST_CASE("invalid_tokens", "[type][invalid]")
     }
     CATCH_END_SECTION()
 
-    CATCH_START_SECTION("is_token -- 2nd+ must be alpha or digit")
+    CATCH_START_SECTION("invalid_tokens: is_token -- 2nd+ must be alpha or digit")
     {
-        for(int c(1); c < 256; ++c)
+        for(char32_t c(1); c < 0x110000; ++c)
         {
-            if(basic_xml::is_alpha(c)
+            if(c >= 0xD800 && c <= 0xDFFF)
+            {
+                // those are not characters, so don't bother (the libutf8::to_u8string() will fail
+                // here and would fail there but more or less we can't pass those in UTF-8)
+                //
+                continue;
+            }
+            if(is_xml_alpha(c)
             || basic_xml::is_digit(c))
             {
                 continue;
@@ -187,7 +279,7 @@ CATCH_TEST_CASE("invalid_tokens", "[type][invalid]")
             std::string token;
             token += static_cast<char>(rand() % 26 + 'a');
 
-            token += static_cast<char>(c);
+            token += libutf8::to_u8string(c);
             CATCH_REQUIRE_FALSE(basic_xml::is_token(token));
 
             token[0] = static_cast<char>(rand() % 26 + 'A');
@@ -195,51 +287,6 @@ CATCH_TEST_CASE("invalid_tokens", "[type][invalid]")
 
             token[0] = '_';
             CATCH_REQUIRE_FALSE(basic_xml::is_token(token));
-        }
-    }
-    CATCH_END_SECTION()
-
-    CATCH_START_SECTION("is_token -- last cannot be '-'")
-    {
-        for(int count(0); count < 10; ++count)
-        {
-            std::string token;
-            int max(rand() % 10 + 10);
-            for(int len(0); len < max; ++len)
-            {
-                switch(rand() % (token.empty() ? 3 : 5))
-                {
-                case 0:
-                    token += static_cast<char>(rand() % 26 + 'a');
-                    break;
-
-                case 1:
-                    token += static_cast<char>(rand() % 26 + 'A');
-                    break;
-
-                case 2:
-                    token += '_';
-                    break;
-
-                case 3:
-                    token += static_cast<char>(rand() % 10 + '0');
-                    break;
-
-                case 4:
-                    token += '-';
-                    break;
-
-                }
-            }
-
-            token += '-';
-            CATCH_REQUIRE_FALSE(basic_xml::is_token(token));
-
-            // make sure the token is actually valid if not ending with '-'
-            // (testing the test)
-            //
-            token += 'q';
-            CATCH_REQUIRE(basic_xml::is_token(token));
         }
     }
     CATCH_END_SECTION()
