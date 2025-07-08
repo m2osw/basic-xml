@@ -39,6 +39,7 @@
 //
 #include    <snapdev/not_reached.h>
 #include    <snapdev/trim_string.h>
+#include    <snapdev/string_replace_many.h>
 
 
 // C++
@@ -62,7 +63,10 @@ node::node(std::string const & name)
 {
     if(!is_token(name))
     {
-        throw invalid_token("\"" + name + "\" is not a valid token for a tag name.");
+        throw invalid_token(
+                  "\""
+                + snapdev::string_replace_many(name, {{std::string("\0", 1), "\\0"}})
+                + "\" is not a valid token for a tag name.");
     }
 }
 

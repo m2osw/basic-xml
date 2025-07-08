@@ -124,7 +124,7 @@ constexpr char_range_t const g_name_char[] =
     { 0x003001, 0x00D7FF },
     { 0x00F900, 0x00FDCF },
     { 0x00FDF0, 0x00FFFD },
-    { 0x010000, 0x0EFFFF },     // forbid all FFFE & FFFF?
+    { 0x010000, 0x0EFFFF },     // forbid all XFFFE & XFFFF?
 };
 
 

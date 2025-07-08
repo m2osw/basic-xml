@@ -350,7 +350,9 @@ CATCH_TEST_CASE("node_errors", "[node][invalid]")
                         , basic_xml::invalid_token
                         , Catch::Matchers::ExceptionMessage(
                                   "xml_error: \""
-                                + bad_name
+                                + tag_name.substr(0, pos)
+                                + (mid == U'\0' ? "\\0" : libutf8::to_u8string(mid))
+                                + tag_name.substr(pos)
                                 + "\" is not a valid token for a tag name."));
             }
         }
