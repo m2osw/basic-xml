@@ -20,8 +20,11 @@
 ##
 ## Documentation
 ##
+project(basic-xml-documentation)
+
 find_package(SnapDoxygen)
-AddDoxygenTarget(basic-xml
+AddDoxygenTarget(
+    basic-xml
     ${BASIC_XML_VERSION_MAJOR}
     ${BASIC_XML_VERSION_MINOR}
     ${BASIC_XML_VERSION_PATCH}
