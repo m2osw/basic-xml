@@ -84,6 +84,7 @@ void parser::load(node::pointer_t & root)
     tok = skip_empty(tok);
 
     // now we have to have the root tag
+    //
     if(tok != token_t::TOK_OPEN_TAG)
     {
         throw unexpected_token(
