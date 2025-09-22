@@ -21,7 +21,6 @@ cmake_minimum_required(VERSION 3.10.2)
 # The Snap! C++ Versatile Database Support
 project(basic_xml_project)
 
-find_package(Boost            REQUIRED)
 find_package(LibExcept        REQUIRED)
 find_package(LibUtf8          REQUIRED)
 find_package(SnapCMakeModules REQUIRED)
